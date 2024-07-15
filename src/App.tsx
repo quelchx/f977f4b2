@@ -1,9 +1,11 @@
+import { ActivityFeed } from "./components/base/activity-feed";
+
 function App() {
   return (
-  <div>
-    <h2>Hello World</h2>
-  </div>
-  )
+    <div className="max-w-3xl py-8 mx-auto text-center">
+      <ActivityFeed />
+    </div>
+  );
 }
 
-export default App
+export default App;

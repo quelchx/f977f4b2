@@ -15,6 +15,7 @@ export function ActivityFeed() {
   const time = useLocalTime();
   const queryClient = useQueryClient();
   const { data, isLoading, isError, isFetching } = useActivityFeed();
+
   const [archived, setArchived] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
@@ -72,15 +73,15 @@ export function ActivityFeed() {
               className="bg-slate-500"
               onClick={() => setArchived(!archived)}
             >
-              View Archived
+              {archived ? "Show Active" : "Show Archived"}
             </Button>
             <Button
               size="sm"
               className="bg-green-500"
               onClick={() => mutation.mutate()}
-              disabled={calls.length === 0}
+              disabled={calls.length === 0 || isPending}
             >
-              Archive All
+              {archived ? "Unarchive All" : "Archive All"}
             </Button>
           </div>
         </div>

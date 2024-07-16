@@ -7,9 +7,9 @@ import { useLocalTime } from "@/hooks/useLocaleTime";
 import { useActivityFeed } from "@/hooks/useActivityFeed";
 
 import { cn } from "@/lib/utils";
-import { config } from "@/config";
 
 import { ActivityCard } from "./activity-card";
+import { archiveCall } from "@/controllers/activities.controller";
 
 export function ActivityFeed() {
   const time = useLocalTime();
@@ -25,26 +25,18 @@ export function ActivityFeed() {
     return data?.filter((activity) => activity.is_archived === archived);
   }, [data, archived]);
 
-  async function handleArchiveAll() {
-    if (calls) {
-      setIsPending(true);
-
-      for (const call of calls) {
-        await fetch(`${config.apiUrl}/activities/${call.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ is_archived: !call.is_archived }),
-        });
-      }
-
-      setIsPending(false);
-    }
-  }
-
   const mutation = useMutation({
-    mutationFn: handleArchiveAll,
+    mutationFn: async () => {
+      if (calls) {
+        setIsPending(true);
+
+        for (const call of calls) {
+          await archiveCall(call.id, call.is_archived);
+        }
+
+        setIsPending(false);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activity-feed"] });
     },
@@ -64,7 +56,7 @@ export function ActivityFeed() {
       >
         <div className="flex items-center justify-between w-full">
           <h2 className="text-lg font-semibold">
-            Activity Feed ({calls.length})
+            {archived ? "Archived Calls" : "Activity Feed"} ({calls.length})
           </h2>
 
           <div className="flex items-center space-x-2">

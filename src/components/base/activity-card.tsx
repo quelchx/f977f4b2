@@ -22,28 +22,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { config } from "@/config";
 import type { CallDetails } from "@/types";
+import { archiveCall } from "@/controllers/activities.controller";
 
 function IconDropDownMenu(props: CallDetails) {
   const queryClient = useQueryClient();
 
-  async function handleArchive() {
-    const response = await fetch(`${config.apiUrl}/activities/${props.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ is_archived: !props.is_archived }),
-    });
-
-    if (response.ok) {
-      console.log("Successfully archived call");
-    }
-  }
-
   const mutation = useMutation({
-    mutationFn: handleArchive,
+    mutationFn: async () => {
+      await archiveCall(props.id, props.is_archived);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activity-feed"] });
     },
